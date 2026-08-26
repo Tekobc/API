@@ -76,55 +76,83 @@ app.get("/personas/nombres", (req, res) => {
 });
 
 
-  
-
 app.put("/put/:id", (req, res) => {
   const id = Number(req.params.id);
   const { nombre, apellido } = req.body;
 
-  const persona = personas.find(persona => persona.id === id);
+  let personaEncontrada = null;
 
-  // if (!persona) {
-  //   return res.status(404).json({
-  //     mensaje: "Persona no encontrada"
-  //   });
-  // }
+  for (let i = 0; i < personas.length; i++) {
+    if (personas[i].id === id) {
+      personaEncontrada = personas[i];
+      personaEncontrada.nombre = nombre;
+      personaEncontrada.apellido = apellido;
+      res.status(200).json({
+      mensaje: "Persona actualizada correctamente",
+      persona: personaEncontrada
+      });
+    }
+  }
 
-  persona.nombre = nombre;
-  persona.apellido = apellido;
-
-  res.status(200).json({
-    mensaje: "Persona actualizada correctamente",
-    persona
-  });
-});
-
-
-app.put("/personas/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const  apellido  = req.body
-
-  const persona = personas.find(persona => persona.id === id);
-
-  if (!persona) {
+  if (!personaEncontrada) {
     return res.status(404).json({
       mensaje: "Persona no encontrada"
     });
   }
 
-  if (!apellido) {
-    return res.status(400).json({
-      mensaje: "El apellido es obligatorio"
-    });
-  }
+  
 
-  persona.apellido = apellido;
-
-  res.status(200).json({
-    mensaje: "Apellido actualizado correctamente",
-    persona
-  });
+  
 });
+  
+
+// app.put("/put/:id", (req, res) => {
+//   const id = Number(req.params.id);
+//   const { nombre, apellido } = req.body;
+//       for (let i = 0; i < personas.length; i++) {
+//   console.log(personas[i].nombre);
+//     }
+//   // if (!persona) {
+//   //   return res.status(404).json({
+//   //     mensaje: "Persona no encontrada"
+//   //   });
+//   // }
+
+//   persona.nombre = nombre;
+//   persona.apellido = apellido;
+
+//   res.status(200).json({
+//     mensaje: "Persona actualizada correctamente",
+//     persona
+//   });
+// });
+
+
+// app.put("/personas/:id", (req, res) => {
+//   const id = Number(req.params.id);
+//   const  apellido  = req.body
+
+//   const persona = personas.find(persona => persona.id === id);
+
+//   if (!persona) {
+//     return res.status(404).json({
+//       mensaje: "Persona no encontrada"
+//     });
+//   }
+
+//   if (!apellido) {
+//     return res.status(400).json({
+//       mensaje: "El apellido es obligatorio"
+//     });
+//   }
+
+//   persona.apellido = apellido;
+
+//   res.status(200).json({
+//     mensaje: "Apellido actualizado correctamente",
+//     persona
+//   });
+// });
 
 
 app.delete("/delete/:id", (req, res) => {

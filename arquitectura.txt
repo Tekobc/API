@@ -1,0 +1,103 @@
+restauranthub-api/
+├── src/
+│   ├── app.js
+│   ├── server.js
+│   │
+│   ├── config/
+│   │   ├── database.js
+│   │   └── env.js
+│   │
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   ├── menu.routes.js
+│   │   ├── table.routes.js
+│   │   ├── reservation.routes.js
+│   │   ├── order.routes.js
+│   │   ├── transaction.routes.js
+│   │   ├── cashRegister.routes.js
+│   │   └── stats.routes.js
+│   │
+│   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   ├── menu.controller.js
+│   │   ├── table.controller.js
+│   │   ├── reservation.controller.js
+│   │   ├── order.controller.js
+│   │   ├── transaction.controller.js
+│   │   ├── cashRegister.controller.js
+│   │   └── stats.controller.js
+│   │
+│   ├── services/
+│   │   ├── auth.service.js
+│   │   ├── menu.service.js
+│   │   ├── table.service.js
+│   │   ├── reservation.service.js
+│   │   ├── order.service.js
+│   │   ├── transaction.service.js
+│   │   ├── cashRegister.service.js
+│   │   └── stats.service.js
+│   │
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── MenuItem.js
+│   │   ├── Table.js
+│   │   ├── Category.js
+│   │   ├── Reservation.js
+│   │   ├── Order.js
+│   │   ├── Transaction.js
+│   │   └── CashRegister.js
+│   │
+│   ├── middlewares/
+│   │   ├── auth.middleware.js
+│   │   ├── role.middleware.js
+│   │   ├── error.middleware.js
+│   │   ├── validation.middleware.js
+│   │   └── upload.middleware.js
+│   │
+│   ├── validations/
+│   │   ├── auth.validation.js
+│   │   ├── menu.validation.js
+│   │   ├── reservation.validation.js
+│   │   ├── order.validation.js
+│   │   ├── transaction.validation.js
+│   │   └── table.validation.js
+│   │
+│   ├── utils/
+│   │   ├── jwt.js
+│   │   ├── password.js
+│   │   ├── apiError.js
+│   │   ├── apiResponse.js
+│   │   └── date.js
+│   │
+│   ├── seeds/
+│   │   ├── tables.seed.js
+│   │   ├── categories.seed.js
+│   │   └── seed.js
+│   │
+│   └── docs/
+│       └── testing-manual.md
+│
+├── tests/
+│   ├── auth.test.js
+│   ├── menu.test.js
+│   ├── tables.test.js
+│   ├── reservations.test.js
+│   ├── orders.test.js
+│   ├── transactions.test.js
+│   ├── cash-register.test.js
+│   └── stats.test.js
+│
+├── postman/
+│   ├── RestaurantHub.postman_collection.json
+│   ├── RestaurantHub.Local.postman_environment.json
+│   └── README.md
+│
+├── uploads/
+│   └── menu/
+│
+├── .env
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+└── README.md
