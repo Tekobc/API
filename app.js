@@ -1,10 +1,11 @@
- 
 import express from 'express';
+import usuarioRoutes from './routes/usuario.route.js';
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use('/api', usuarioRoutes);
 
 const personas = [
   {
@@ -176,7 +177,7 @@ app.delete("/delete/:id", (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(``);
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
 
 
