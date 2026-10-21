@@ -69,33 +69,54 @@ Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```env
 # Servidor
+HOST=0.0.0.0
 PORT=3000
 NODE_ENV=development
 
 # Base de datos
-MONGODB_URI=mongodb://localhost:27017/restauranthub
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=<contraseña_mysql>
+DB_NAME=restauranthub
 
 # Autenticación
 JWT_SECRET=<clave_secreta>
-JWT_EXPIRES_IN=3600
-REFRESH_TOKEN_SECRET=<clave_secreta_refresh>
-REFRESH_TOKEN_EXPIRES_IN=7d
-
-# Carga de archivos
-UPLOAD_PATH=/uploads/images
+BCRYPT_SALT_ROUNDS=10
 ```
 
 ## Uso
 
 ```bash
-# Modo desarrollo (hot reload)
+# Crear las tablas desde MySQL Workbench o la terminal
+# Ejecutar restauranthub-sql/restauranthub-sql/mysql/01_schema.sql
+
+# Cargar los datos de demostración
+npm run seed
+
+# Iniciar en modo desarrollo (hot reload)
 npm run dev
 
 # Modo producción
 npm start
 ```
 
-El servidor quedará disponible en `http://localhost:3000/api`.
+El seed carga el usuario administrador, categorías y mesas de ejemplo. Para la demo, usa `admin@example.com` con contraseña `admin123`. El comando es idempotente para esos registros; si lo vuelves a ejecutar, actualiza el usuario de demostración.
+
+Abre `http://localhost:3000/` para mostrar la interfaz de presentación interactiva, o `http://localhost:3000/api` para la base de la API. La interfaz permite probar login y perfil.
+
+El servidor también puede quedar disponible en `http://localhost:3000/api` en el mismo equipo. Para acceder desde otro dispositivo conectado a la misma red:
+
+1. Obtén la dirección IPv4 del equipo donde corre la API con `ipconfig` en Windows.
+2. Inicia la API con `npm run dev`.
+3. Desde el otro dispositivo, usa `http://<IP_DEL_EQUIPO>:3000/api` (por ejemplo, `http://192.168.1.20:3000/api`).
+4. Si Windows Firewall lo solicita, permite conexiones entrantes al puerto TCP `3000` solo en redes privadas. Ambos dispositivos deben estar en la misma red y el router no debe redirigir ese puerto desde Internet.
+
+`HOST=0.0.0.0` hace que la API escuche en las interfaces de red del equipo. Para limitarla al propio equipo, configura `HOST=127.0.0.1`.
+
+### Interfaz de presentación
+
+Al iniciar el servidor, abre `http://localhost:3000/` para ver la interfaz explicativa y la demostración de autenticación. Desde otro dispositivo de la misma red, abre `http://<IP_DEL_EQUIPO>:3000/`. La interfaz diferencia las rutas conectadas de los módulos que aún están pendientes y permite probar el inicio de sesión, el registro y la consulta del perfil.
 
 ## Estructura del proyecto
 
