@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RestaurantHub · Módulo /menu paso a paso</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@600;700&display=swap">
+<style>
+*{box-sizing:border-box}
+:root{--bg:#fbf6ee;--card:#fff;--ink:#2b2118;--mut:#6f6256;--line:#e8dccb;--acc:#d9482b;--ok:#2e7d5b;--warn:#c98a00;--code:#1f1a16;--codeink:#f6e9d7;--chip:#f3e8d6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120e;--card:#221b15;--ink:#f3e8d9;--mut:#b3a595;--line:#3a2f26;--acc:#ff7a59;--ok:#58c595;--warn:#f0b840;--code:#0f0c09;--codeink:#f6e9d7;--chip:#2e251d}}
+:root[data-theme="dark"]{--bg:#17120e;--card:#221b15;--ink:#f3e8d9;--mut:#b3a595;--line:#3a2f26;--acc:#ff7a59;--ok:#58c595;--warn:#f0b840;--code:#0f0c09;--codeink:#f6e9d7;--chip:#2e251d}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:auto;padding:0 18px}
+h1,h2{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0}
+h1{font-size:clamp(30px,6vw,48px)}h2{font-size:26px;margin-bottom:6px}
+code{background:var(--chip);padding:1px 6px;border-radius:6px;font-size:.92em}
+.hero{padding:44px 0 28px;border-bottom:1px solid var(--line)}
+.kicker{color:var(--acc);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;margin:0 0 8px}
+.lead{color:var(--mut);max-width:640px;font-size:18px;margin:12px 0 0}
+section{margin:38px 0}.sub{color:var(--mut);margin:0 0 16px}
+.lab{display:grid;grid-template-columns:5fr 7fr;gap:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+label{display:block;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 5px}
+input{margin-bottom:6px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}label:first-child{margin-top:0}
+input,select,textarea{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:14px ui-monospace,Menlo,monospace}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:600 14px inherit;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.go{width:100%;margin-top:14px;padding:12px;border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 16px inherit;cursor:pointer}
+.go:active{transform:scale(.98)}
+.req{font:13px ui-monospace,Menlo,monospace;color:var(--mut);margin:0 0 10px;word-break:break-all}
+.pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.node{position:relative;text-align:center;font-size:12px;color:var(--mut)}
+.node:not(:last-child)::after{content:"›";position:absolute;right:-7px;top:9px;font-size:20px}
+.dot{width:44px;height:44px;margin:0 auto 4px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:var(--chip);border:2px solid var(--line);transition:.25s}
+.node b{display:block;color:var(--ink);font-size:13px}
+.node.ok .dot{background:var(--ok);border-color:var(--ok);transform:scale(1.08)}
+.node.bad .dot{background:var(--acc);border-color:var(--acc);transform:scale(1.12)}
+.node.skip{opacity:.4}
+.why{margin:14px 0 10px;padding:11px 13px;border-left:4px solid var(--warn);background:var(--chip);border-radius:0 10px 10px 0;font-size:15px;min-height:46px}
+.st{display:inline-block;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--chip);margin-bottom:6px}
+.st.ok{background:var(--ok);color:#fff}.st.bad{background:var(--acc);color:#fff}
+pre{margin:0;background:var(--code);color:var(--codeink);padding:12px;border-radius:10px;overflow-x:auto;font-size:13px;max-height:260px}
+h4{margin:14px 0 6px;font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.dec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.dec .n{width:30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700}
+.dec h3{margin:0;font-size:17px}.dec p{margin:0;color:var(--mut);font-size:15px;flex:1}
+.dec button{align-self:flex-start;border:1px solid var(--acc);background:none;color:var(--acc);font:700 14px inherit;padding:8px 14px;border-radius:10px;cursor:pointer}
+.live{display:grid;grid-template-columns:7fr 5fr;gap:16px}
+.cat h4{font-size:15px;color:var(--ink);text-transform:none;letter-spacing:0;margin:0 0 8px}.cat{margin-bottom:14px}
+.dishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.dish{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px;background:var(--bg)}
+.dish.off{opacity:.55}.dish small{color:var(--mut)}.pr{color:var(--acc);font-weight:700}
+.tag{font-style:normal;font-size:11px;font-weight:700;background:var(--warn);color:#000;border-radius:6px;padding:1px 6px;align-self:flex-start;margin-top:3px}
+.tag.ok{background:var(--ok);color:#fff}
+.ord{border:1px dashed var(--line);border-radius:12px;padding:12px}
+.diff{color:var(--acc);font-weight:700}
+.model{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.tb{flex:1;min-width:200px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:14px}
+.tb b{font:700 15px ui-monospace,Menlo,monospace;color:var(--acc)}
+.tb ul{margin:6px 0 0;padding-left:18px;color:var(--mut)}
+.arrow{align-self:center;font-size:12px;color:var(--mut);text-align:center;width:70px}
+.reset{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font:inherit}
+footer{padding:20px 0 40px;color:var(--mut);font-size:14px}
+@media(max-width:820px){.lab,.live{grid-template-columns:1fr}.pipe{grid-template-columns:repeat(3,1fr);row-gap:14px}.node:nth-child(3)::after{display:none}.arrow{width:100%}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<p class="kicker">RestaurantHub · API REST</p>
+<h1>El módulo <code>/menu</code>, paso a paso</h1>
+<p class="lead">Mandá peticiones de verdad contra una réplica de la API y mirá cómo viaja cada una: quién la deja pasar, qué reglas del negocio se aplican y qué le pasa a la base de datos.</p>
+</div></header>
+
+<main class="wrap">
+<section id="lab">
+<h2>1 · Probá la API</h2>
+<p class="sub">Elegí tu rol, un endpoint, y apretá enviar. Podés editar el JSON.</p>
+<div class="seg" id="modes" style="max-width:320px;margin-bottom:12px"><button data-m="sim" class="on">Simulado</button><button data-m="real">API real</button></div>
+<div class="panel" id="conn" style="display:none;margin-bottom:16px">
+ <label>URL de la API (vacío = el mismo servidor que sirve esta página)</label><input id="base" placeholder="http://localhost:3000">
+ <label>Usuario admin</label><div class="two"><input id="ae" placeholder="email"><input id="ap" type="password" placeholder="contraseña"></div>
+ <label>Usuario cliente (opcional, para ver el 403)</label><div class="two"><input id="ce" placeholder="email"><input id="cp" type="password" placeholder="contraseña"></div>
+ <button class="go" id="connect" style="margin-top:6px">Conectar y cargar la carta</button><p class="sub" id="cmsg" style="margin:8px 0 0"></p>
+</div>
+<div class="lab">
+ <div class="panel">
+  <label>¿Quién sos? (el token que enviás)</label>
+  <div class="seg" id="roles"><button data-r="none">Visitante</button><button data-r="client">Cliente</button><button data-r="admin" class="on">Admin</button></div>
+  <label>Endpoint</label><select id="ep"></select>
+  <div id="idrow"><label>Plato (:id)</label><select id="idsel"></select></div>
+  <label>Body / filtros (JSON)</label><textarea id="body" rows="7" spellcheck="false"></textarea>
+  <div id="filerow" style="display:none"><label>Imagen (JPG, PNG o WEBP)</label><input type="file" id="file" accept="image/jpeg,image/png,image/webp"></div>
+  <p class="sub" id="hint" style="font-size:13px;margin:6px 0 0">Categorías: <code>c1</code> principales · <code>c2</code> ensaladas · <code>c3</code> bebidas (en la BD real son UUID)</p>
+  <button class="go" id="send">Enviar petición ▶</button>
+ </div>
+ <div class="panel">
+  <p class="req" id="req">Todavía no enviaste nada.</p>
+  <div class="pipe" id="pipe"></div>
+  <div class="why" id="why">Cada petición pasa por 6 estaciones. Si una falla, las siguientes ni se enteran.</div>
+  <span class="st" id="st">—</span><pre id="out">{ }</pre>
+  <h4>SQL que se ejecuta</h4><pre id="sql">-- esperando petición</pre>
+ </div>
+</div>
+</section>
+
+<section>
+<h2>2 · Decisiones de negocio</h2>
+<p class="sub">Cada tarjeta es una regla del restaurante. Tocá el botón y se ejecuta sola.</p>
+<div class="cards" id="decs"></div>
+</section>
+
+<section>
+<h2>3 · Lo que pasa en el restaurante (en vivo)</h2>
+<p class="sub">Esto se actualiza con cada petición. <button class="reset" onclick="location.reload()">↺ Reiniciar datos</button></p>
+<div class="live">
+ <div class="panel"><div id="menu"></div></div>
+ <div class="panel"><h4 style="margin-top:0">Historial de ventas</h4><div class="ord" id="orders"></div>
+ <p class="sub" style="font-size:14px;margin:10px 0 0">El pedido guarda el precio del momento. Cambiar la carta no reescribe la historia.</p></div>
+</div>
+</section>
+
+<section>
+<h2>4 · Cómo se guardan los datos</h2>
+<p class="sub">Tres tablas y dos relaciones. De ahí salen casi todas las reglas.</p>
+<div class="model">
+ <div class="tb"><b>categories</b><ul><li>name (única)</li><li>description, icon</li></ul></div>
+ <div class="arrow">1 → N<br>una categoría tiene muchos platos</div>
+ <div class="tb"><b>menu_items</b><ul><li>price ≥ 0 (CHECK)</li><li>category_id (obligatorio)</li><li>available · image_url</li></ul></div>
+ <div class="arrow">1 → N<br>RESTRICT: no se borra si se vendió</div>
+ <div class="tb"><b>order_items</b><ul><li>quantity ≥ 1</li><li>price = foto del precio al vender</li></ul></div>
+</div>
+</section>
+</main>
+<footer class="wrap">Modo simulado: réplica en el navegador de las reglas de <code>menu.service.js</code>. Modo API real: cada botón llama a tu servidor y a tu base de datos.</footer>
+
+<script>
+const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let cats=[{id:"c1",name:"platos principales"},{id:"c2",name:"ensaladas"},{id:"c3",name:"bebidas"}],EM=["🍽️","🥗","🥤"];
+let items=[
+{id:"m1",name:"Milanesa con papas",description:"Ternera con papas fritas",price:450,categoryId:"c1",available:true},
+{id:"m2",name:"Bife de chorizo",description:"A la parrilla",price:650,categoryId:"c1",available:true},
+{id:"m3",name:"Ensalada César",description:"Pollo, crutones y parmesano",price:320,categoryId:"c2",available:true},
+{id:"m4",name:"Limonada",description:"Con menta y jengibre",price:180,categoryId:"c3",available:true}];
+const sold=[{order:"#1042",mid:"m1",qty:2,price:450}];let seq=5;
+const ST={200:"OK",201:"Created",400:"Bad Request",401:"Unauthorized",403:"Forbidden",404:"Not Found",409:"Conflict"};
+const NODES=[["📨","Petición","llega a Express"],["🔑","Auth","token y rol"],["✅","Validación","datos en regla"],["🧠","Service","reglas del negocio"],["🗄️","Base de datos","SQL y restricciones"],["📬","Respuesta","JSON + status"]];
+const V="SELECT m.*, c.name AS category FROM menu_items m JOIN categories c ON c.id = m.category_id";
+const EP=[
+{k:"list",m:"GET",p:"/api/menu/items",id:0,w:0,t:{category:"bebidas",available:true,limit:5},sql:V+"\nWHERE c.name = $1 AND m.available = $2\nORDER BY m.name LIMIT 5 OFFSET 0;"},
+{k:"one",m:"GET",p:"/api/menu/items/:id",id:1,w:0,t:{},sql:V+"\nWHERE m.id = $1;"},
+{k:"new",m:"POST",p:"/api/menu/items",id:0,w:1,t:{name:"Ravioles de ricota",description:"Con salsa fileto",price:480,categoryId:"c1"},sql:"INSERT INTO menu_items (name, description, price, category_id, available)\nVALUES ($1, $2, $3, $4, true) RETURNING id;"},
+{k:"upd",m:"PUT",p:"/api/menu/items/:id",id:1,w:1,t:{price:520},sql:"UPDATE menu_items SET price = $1\nWHERE id = $2;"},
+{k:"del",m:"DELETE",p:"/api/menu/items/:id",id:1,w:1,t:{},sql:"DELETE FROM menu_items WHERE id = $1;\n-- ERROR 23503: viola la FK de order_items (ON DELETE RESTRICT)"},
+{k:"img",m:"POST",p:"/api/menu/items/:id/upload-image",id:1,w:1,t:{image:"milanesa.jpg"},sql:"UPDATE menu_items SET image_url = $1\nWHERE id = $2;"}];
+const WHY={INVALID_TOKEN:"Sin token no sabemos quién sos. La petición se corta en Auth y nunca toca la base de datos.",INSUFFICIENT_PERMISSIONS:"Estás identificado, pero ser cliente no alcanza para modificar la carta. Solo el admin escribe.",INVALID_INPUT:"Validamos antes de molestar a la base: es más rápido y el mensaje le dice al usuario qué corregir.",ITEM_NOT_FOUND:"El service busca el plato y no existe, así que responde 404 en lugar de inventar algo.",ITEM_IN_USE:"La base protege la historia: ese plato ya se vendió, así que no se borra. Se desactiva con available=false.",list:"Leer la carta es público: no hace falta token. Los filtros y límites evitan traer todo de golpe.",one:"Lectura pública de un solo plato.",new:"Plato creado. Queda disponible por defecto y con imagen pendiente.",upd:"Actualización parcial: solo cambia lo que enviaste. Mirá el historial de ventas abajo.",del:"Plato sin ventas: se pudo borrar.",NET:"No hubo respuesta: ¿está levantado el servidor? Si abriste este archivo con doble clic, serví la página desde Express.",img:"Imagen asociada. En el servidor real viaja como multipart/form-data."};
+let role="admin",mode="sim",tok={},base="",simItems=items,simCats=cats;
+
+function api(k,id,b){
+ const ep=EP.find(e=>e.k===k),f=(stop,st,code,msg)=>({st,stop,sql:ep.sql,j:{success:false,message:msg,code},code});
+ const ok=(st,msg,data)=>({st,stop:5,sql:ep.sql,code:k,j:{success:true,message:msg,data}});
+ const cat=n=>cats.find(c=>c.id===n),find=()=>items.find(i=>i.id===id);
+ const view=i=>({id:i.id,name:i.name,description:i.description,price:i.price,available:i.available,imageUrl:i.imageUrl||null,categoryId:i.categoryId,category:cat(i.categoryId).name});
+ if(ep.w){if(role==="none")return f(1,401,"INVALID_TOKEN","Token inválido o ausente");if(role!=="admin")return f(1,403,"INSUFFICIENT_PERMISSIONS","No tenés permisos para esta acción");}
+ const val=(p)=>{
+  if(!p||"name" in b){if(typeof b.name!=="string"||!b.name.trim())return "El nombre es obligatorio";}
+  if(!p||"price" in b){if(typeof b.price!=="number")return "El precio debe ser numérico";if(b.price<0)return "El precio no puede ser negativo";}
+  if(!p&&!b.categoryId)return "La categoría es obligatoria";
+  if("available" in b&&typeof b.available!=="boolean")return "available debe ser true o false";return null};
+ if(k==="list"){let l=items.filter(i=>(!b.category||cat(i.categoryId).name===b.category)&&(b.available===undefined||i.available===(String(b.available)==="true")));
+  const lim=Math.min(Math.max(Number(b.limit)||10,1),100),off=Math.max(Number(b.skip)||0,0);
+  return ok(200,undefined,{items:l.slice(off,off+lim).map(view),total:l.length,page:Math.floor(off/lim)+1,limit:lim});}
+ if(k==="one"){const i=find();return i?ok(200,undefined,view(i)):f(3,404,"ITEM_NOT_FOUND","Plato no encontrado");}
+ if(k==="new"){const e=val(false);if(e)return f(2,400,"INVALID_INPUT",e);if(!cat(b.categoryId))return f(3,400,"INVALID_INPUT","La categoría no existe");
+  const i={id:"m"+seq++,name:b.name.trim(),description:b.description||"",price:b.price,categoryId:b.categoryId,available:b.available!==false};items.push(i);return ok(201,"Plato creado exitosamente",view(i));}
+ if(k==="upd"){const e=val(true);if(e)return f(2,400,"INVALID_INPUT",e);const i=find();if(!i)return f(3,404,"ITEM_NOT_FOUND","Plato no encontrado");
+  if(b.categoryId&&!cat(b.categoryId))return f(3,400,"INVALID_INPUT","La categoría no existe");
+  if(!Object.keys(b).length)return f(3,400,"INVALID_INPUT","No hay campos para actualizar");
+  ["name","description","price","categoryId","available"].forEach(c=>{if(c in b)i[c]=b[c]});return ok(200,"Plato actualizado exitosamente",view(i));}
+ if(k==="del"){const i=find();if(!i)return f(3,404,"ITEM_NOT_FOUND","Plato no encontrado");
+  if(sold.some(s=>s.mid===id))return f(4,409,"ITEM_IN_USE","El plato figura en pedidos: desactivalo con available=false");
+  items=items.filter(x=>x!==i);return ok(200,"Plato eliminado exitosamente");}
+ if(k==="img"){if(!/\.(jpe?g|png|webp)$/i.test(String(b.image||"")))return f(2,400,"INVALID_INPUT","Solo se aceptan imágenes JPG, PNG o WEBP");
+  const i=find();if(!i)return f(3,404,"ITEM_NOT_FOUND","Plato no encontrado");i.imageUrl="/uploads/menu/"+i.id+"-"+Date.now()+b.image.slice(b.image.lastIndexOf("."));return ok(200,"Imagen subida exitosamente",{imageUrl:i.imageUrl});}
+}
+
+async function login(email,password){
+ const r=await fetch(base+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})});
+ const j=await r.json(),t=j.data&&(j.data.token||j.data.accessToken);
+ if(!r.ok||!t)throw new Error(j.message||"No se pudo iniciar sesión");return t}
+async function load(){
+ try{const r=await fetch(base+"/api/menu/items?limit=100"),j=await r.json();
+  items=j.data.items.map(i=>({...i,categoryId:i.categoryId||i.category}));
+  const m={};items.forEach(i=>m[i.categoryId]=i.category||i.categoryId);cats=Object.entries(m).map(([id,name])=>({id,name}));
+  const c=cats[0];EP[2].t.categoryId=c?c.id:"";pick($("ep").value);
+  $("hint").innerHTML="Categorías: "+(cats.map(c=>`<code>${esc(c.id)}</code> ${esc(c.name)}`).join(" · ")||"ninguna cargada");
+ }catch(e){items=[];cats=[]}
+ render()}
+async function real(k,id,b){
+ const ep=EP.find(e=>e.k===k);let url=base+ep.p.replace(":id",id);const o={method:ep.m,headers:{}};
+ if(tok[role])o.headers.Authorization="Bearer "+tok[role];
+ if(k==="list"){const q=new URLSearchParams(b).toString();if(q)url+="?"+q}
+ else if(k==="img"){const f=$("file").files[0];
+  if(!f)return{st:400,stop:2,sql:ep.sql,code:"INVALID_INPUT",j:{success:false,message:"Elegí un archivo de imagen",code:"INVALID_INPUT"}};
+  const fd=new FormData();fd.append("image",f);o.body=fd}
+ else if(ep.m!=="GET"&&ep.m!=="DELETE"){o.headers["Content-Type"]="application/json";o.body=JSON.stringify(b)}
+ let r,j;try{r=await fetch(url,o);j=await r.json()}catch(e){return{st:500,stop:0,sql:"",code:"NET",j:{success:false,message:"No se pudo conectar: "+e.message,code:"NET"}}}
+ const st=r.status,ok=j.success!==false&&st<400,msg=j.message||"";
+ const stop=ok?5:(st===401||st===403)?1:st===404?3:st===409?4:st===400?(/categor/i.test(msg)&&/existe/i.test(msg)?3:2):4;
+ return{st,j,stop,sql:ep.sql,code:ok?k:(j.code||"")}}
+function setMode(m){
+ if(mode==="sim"){simItems=items;simCats=cats}
+ mode=m;document.querySelectorAll("#modes button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+ $("conn").style.display=m==="real"?"block":"none";
+ if(m==="sim"){items=simItems;cats=simCats;$("hint").innerHTML="Categorías: <code>c1</code> principales · <code>c2</code> ensaladas · <code>c3</code> bebidas (en la BD real son UUID)";EP[2].t.categoryId="c1";render();pick($("ep").value)}
+ else{items=[];cats=[];render();$("cmsg").textContent="Conectate para cargar la carta real."}}
+function render(){
+ $("menu").innerHTML=cats.map((c,ci)=>{const l=items.filter(i=>i.categoryId===c.id);
+  return `<div class="cat"><h4>${EM[ci]} ${c.name}</h4><div class="dishes">${l.map(i=>`<div class="dish${i.available?"":" off"}"><b>${esc(i.name)}</b><span class="pr">$ ${i.price}</span><small>${esc(i.description||"")}</small>${i.available?"":'<em class="tag">Agotado</em>'}${i.imageUrl?'<em class="tag ok">🖼️ con imagen</em>':""}</div>`).join("")||"<small>Sin platos</small>"}</div></div>`}).join("");
+ const s=sold[0],it=items.find(i=>i.id===s.mid);
+ if(mode==="real")$("orders").innerHTML="<small>Modo API real: el historial sale de la tabla <code>order_items</code>, que guarda el precio de cada venta aunque el plato cambie.</small>";else $("orders").innerHTML=`<b>Pedido ${s.order}</b><br>${s.qty} × ${it?esc(it.name):"?"} a <b>$ ${s.price}</b> c/u<br><small>Hoy en la carta: ${it?(it.price!==s.price?`<span class="diff">$ ${it.price}</span> (distinto, y el pedido no cambió)`:"$ "+it.price):"—"}</small>`;
+ const cur=$("idsel").value;$("idsel").innerHTML=items.map(i=>`<option value="${i.id}">${esc(i.name)} (${i.id})</option>`).join("")+'<option value="m999">Plato inexistente (m999)</option>';if(cur)$("idsel").value=cur;
+}
+function pick(k){const ep=EP.find(e=>e.k===k);$("filerow").style.display=mode==="real"&&k==="img"?"block":"none";$("ep").value=k;$("idrow").style.display=ep.id?"block":"none";$("body").value=JSON.stringify(ep.t,null,2);}
+function setRole(r){role=r;document.querySelectorAll("#roles button").forEach(b=>b.classList.toggle("on",b.dataset.r===r));}
+async function send(){
+ const k=$("ep").value,ep=EP.find(e=>e.k===k),id=$("idsel").value;let b;
+ try{b=JSON.parse($("body").value||"{}")}catch(e){$("why").textContent="El JSON no es válido: revisá comas y comillas.";return}
+ if(mode==="real"&&(ep.m==="DELETE"||ep.m==="PUT")&&!confirm("Esto modifica datos reales de tu base. ¿Continuar?"))return;
+ const r=mode==="real"?await real(k,id,b):api(k,id,b),ok=r.j.success!==false&&r.st<400;
+ $("req").textContent=ep.m+" "+ep.p.replace(":id",ep.id?id:"")+(ep.w?"  ·  Authorization: Bearer <"+{none:"sin token",client:"token cliente",admin:"token admin"}[role]+">":"");
+ $("st").textContent="…";$("st").className="st";$("out").textContent="";$("sql").textContent="";$("why").textContent="Viajando…";
+ const nodes=[...$("pipe").children];nodes.forEach(n=>n.className="node");
+ for(let i=0;i<=r.stop;i++){await sleep(230);nodes[i].className="node "+(i===r.stop&&!ok?"bad":"ok");}
+ for(let i=r.stop+1;i<5;i++)nodes[i].className="node skip";
+ if(!ok||r.stop<5){await sleep(180);nodes[5].className="node "+(ok?"ok":"bad");}
+ $("st").textContent=r.st+" "+ST[r.st];$("st").className="st "+(ok?"ok":"bad");
+ $("out").textContent=JSON.stringify(mode==="real"?r.j:r.j.data===undefined&&ok?r.j:ok&&r.j.message===undefined?{success:true,data:r.j.data}:r.j,null,2);
+ $("sql").textContent=r.stop>=3?r.sql:"-- No se llegó a la base de datos: la petición se frenó antes.";
+ $("why").textContent=WHY[r.code]||"";if(mode==="real")await load();else render();
+}
+function init(){
+ $("pipe").innerHTML=NODES.map(n=>`<div class="node"><div class="dot">${n[0]}</div><b>${n[1]}</b>${n[2]}</div>`).join("");
+ $("ep").innerHTML=EP.map(e=>`<option value="${e.k}">${e.m} ${e.p}</option>`).join("");
+ $("ep").onchange=()=>pick($("ep").value);$("send").onclick=send;
+ document.querySelectorAll("#modes button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+ $("connect").onclick=async()=>{base=$("base").value.trim().replace(/\/$/,"");tok={};$("cmsg").textContent="Conectando…";
+  try{tok.admin=await login($("ae").value,$("ap").value);if($("ce").value)tok.client=await login($("ce").value,$("cp").value);await load();
+   $("cmsg").textContent="✅ Conectado ("+(tok.client?"admin y cliente":"solo admin")+"). Platos cargados: "+items.length+"."}
+  catch(e){$("cmsg").textContent="❌ "+e.message}};
+ document.querySelectorAll("#roles button").forEach(b=>b.onclick=()=>setRole(b.dataset.r));
+ const D=[
+  ["Leer es público, escribir es de admin","Cualquiera puede mirar la carta; solo el admin la modifica. Probá crear un plato siendo cliente.","client","new","m1",null,"Probar como cliente"],
+  ["Validar temprano, proteger también la base","El precio no puede ser negativo: la API lo rechaza con un mensaje claro y la base lo bloquea con un CHECK si algo se escapara.","admin","new","m1",{name:"Flan casero",price:-50,categoryId:"c1"},"Crear con precio negativo"],
+  ["Lo vendido no se borra, se desactiva","Un plato con ventas es parte de la historia. Borrarlo rompería los pedidos, así que se marca como no disponible.","admin","del","m1",null,"Intentar borrar la milanesa"],
+  ["El precio de un pedido queda congelado","Subir un precio hoy no cambia lo que se cobró ayer: cada pedido guarda el precio del momento.","admin","upd","m1",{price:520},"Subir la milanesa a $520"],
+  ["Pedir de a poco","Los filtros por categoría y disponibilidad más el límite evitan traer toda la carta cada vez.","none","list","m1",{category:"bebidas",available:true,limit:5},"Listar bebidas como visitante"]];
+ $("decs").innerHTML=D.map((d,i)=>`<div class="dec"><span class="n">${i+1}</span><h3>${d[0]}</h3><p>${d[1]}</p><button data-i="${i}">${d[6]} ▶</button></div>`).join("");
+ $("decs").onclick=e=>{const i=e.target.dataset.i;if(i===undefined)return;const d=D[i];setRole(d[2]);pick(d[3]);if(mode==="sim")$("idsel").value=d[4];if(d[5])$("body").value=JSON.stringify(d[5],null,2);$("lab").scrollIntoView();send();};
+ render();pick("list");
+}
+init();
+</script>
+</body>
+</html>
