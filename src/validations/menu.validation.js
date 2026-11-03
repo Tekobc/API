@@ -1,47 +1,31 @@
-import { checkSchema } from 'express-validator';
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const validateMenuItem = checkSchema({
-  // name of the menu item
-  name: {
-    in: ['body'],
-    isString: true,
-    trim: true,
-    notEmpty: { errorMessage: 'El nombre es obligatorio' },
-    isLength: { options: { min: 2, max: 150 }, errorMessage: 'El nombre debe tener entre 2 y 150 caracteres' },
-  },
-  // optional description
-  description: {
-    in: ['body'],
-    optional: true,
-    isString: true,
-    trim: true,
-  },
-  // price – must be positive float
-  price: {
-    in: ['body'],
-    isFloat: { options: { gt: 0 } },
-    toFloat: true,
-    errorMessage: 'El precio debe ser un número positivo',
-  },
-  // category foreign key
-  category_id: {
-    in: ['body'],
-    isInt: { options: { gt: 0 } },
-    toInt: true,
-    errorMessage: 'El id de categoría debe ser un entero positivo',
-  },
-  // optional availability flag
-  available: {
-    in: ['body'],
-    optional: true,
-    isBoolean: true,
-    toBoolean: true,
-  },
-  // optional image URL
-  image_url: {
-    in: ['body'],
-    optional: true,
-    isURL: { errorMessage: 'URL de imagen inválida' },
-    trim: true,
-  },
-});
+export const validateMenuItem = (data = {}, partial = false) => {
+  const name = data.name;
+  const price = data.price;
+  const categoryId = data.categoryId ?? data.category_id;
+
+  if (!partial || name !== undefined) {
+    if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 150) {
+      return { valid: false, message: 'El nombre debe tener entre 2 y 150 caracteres' };
+    }
+  }
+  if (!partial || price !== undefined) {
+    if (!Number.isFinite(Number(price)) || Number(price) < 0) {
+      return { valid: false, message: 'El precio debe ser un número no negativo' };
+    }
+  }
+  if (!partial || categoryId !== undefined) {
+    if (typeof categoryId !== 'string' || !UUID.test(categoryId)) {
+      return { valid: false, message: 'El id de categoría debe ser un UUID válido' };
+    }
+  }
+  if (data.description !== undefined && typeof data.description !== 'string') {
+    return { valid: false, message: 'La descripción debe ser texto' };
+  }
+  if (data.available !== undefined && typeof data.available !== 'boolean') {
+    return { valid: false, message: 'available debe ser booleano' };
+  }
+
+  return { valid: true, message: 'Validación exitosa' };
+};
