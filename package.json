@@ -7,6 +7,7 @@
   "scripts": {
     "migrate": "node src/migrate.js",
     "seed": "node src/seeds/seed.js",
+    "seedm": "npm run seed",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "test": "jest --detectOpenHandles --forceExit"

@@ -9,6 +9,13 @@ const selectMenu = `
   JOIN categories c ON c.id = m.category_id`;
 
 export const createMenuItem = async ({ name, description = '', price, categoryId, available = true }) => {
+  const [categoryRows] = await pool.execute('SELECT id FROM categories WHERE id = ?', [categoryId]);
+  if (!categoryRows[0]) {
+    const error = new Error('La categoría no existe');
+    error.status = 400;
+    throw error;
+  }
+
   const id = randomUUID();
   const [result] = await pool.execute(
     `INSERT INTO menu_items (id, name, description, price, category_id, available)
@@ -57,6 +64,14 @@ export const updateMenuItem = async (id, data) => {
     }
   }
   if (!fields.length) return { affectedRows: 0 };
+  if (data.categoryId !== undefined) {
+    const [categoryRows] = await pool.execute('SELECT id FROM categories WHERE id = ?', [data.categoryId]);
+    if (!categoryRows[0]) {
+      const error = new Error('La categoría no existe');
+      error.status = 400;
+      throw error;
+    }
+  }
   values.push(id);
   const [result] = await pool.execute(`UPDATE menu_items SET ${fields.join(', ')} WHERE id = ?`, values);
   return result;

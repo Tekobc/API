@@ -84,6 +84,29 @@ La API queda disponible en `http://localhost:3000`.
 | `DELETE` | `/api/menu/items/:id` | Administrador |
 | `POST` | `/api/menu/items/:id/upload-image` | Administrador |
 
+### Categorías
+
+| Método | Ruta | Acceso |
+|---|---|---|
+| `GET` | `/api/categories` | Público |
+| `GET` | `/api/categories/:id` | Público |
+| `POST` | `/api/categories` | Administrador |
+| `PUT` | `/api/categories/:id` | Administrador |
+| `DELETE` | `/api/categories/:id` | Administrador |
+
+Para crear un plato, primero consultar `GET /api/categories` y usar el `id`
+UUID devuelto como `category_id` o `categoryId`:
+
+```json
+{
+  "name": "Ravioles de ricota",
+  "description": "Con salsa fileto",
+  "price": 480,
+  "category_id": "UUID_REAL_DE_LA_CATEGORIA",
+  "available": true
+}
+```
+
 Las rutas protegidas requieren el encabezado:
 
 ```http
@@ -133,6 +156,7 @@ La demo permite probar el módulo `/menu` en modo simulado o contra la API real.
 | `npm run dev` | Inicia el servidor con Nodemon |
 | `npm start` | Inicia el servidor |
 | `npm run seed` | Carga datos de demostración |
+| `npm run seedm` | Alias compatible de `npm run seed` |
 | `npm run migrate` | Ejecuta las migraciones disponibles |
 | `npm test` | Ejecuta las pruebas |
 

@@ -1,15 +1,22 @@
 import { Router } from 'express';
-import { getAllCategories, getCategoryById, createCategory, updateCategory, deleteCategory } from '../controllers/category.controller.js';
+import {
+  getCategories,
+  getCategory,
+  createNewCategory,
+  updateExistingCategory,
+  deleteExistingCategory
+} from '../controllers/category.controller.js';
 import { validate } from '../middlewares/validation.middleware.js';
 import { validateCategory } from '../validations/category.validation.js';
-import { protect, role } from '../middlewares/auth.middleware.js';
+import { protect } from '../middlewares/auth.middleware.js';
+import { role } from '../middlewares/role.middleware.js';
 
 const router = Router();
 
-router.get('/', getAllCategories);
-router.get('/:id', getCategoryById);
-router.post('/', protect, role('admin'), validate(validateCategory), createCategory);
-router.put('/:id', protect, role('admin'), validate(validateCategory), updateCategory);
-router.delete('/:id', protect, role('admin'), deleteCategory);
+router.get('/', getCategories);
+router.get('/:id', getCategory);
+router.post('/', protect, role('admin'), validate(validateCategory), createNewCategory);
+router.put('/:id', protect, role('admin'), validate(validateCategory), updateExistingCategory);
+router.delete('/:id', protect, role('admin'), deleteExistingCategory);
 
 export default router;

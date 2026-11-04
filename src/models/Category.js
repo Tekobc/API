@@ -1,8 +1,13 @@
 import { pool } from '../db.js';
+import { randomUUID } from 'node:crypto';
 
 export const createCategory = async ({ name, description = '' }) => {
-  const sql = 'INSERT INTO categories (name, description) VALUES (?, ?)';
-  const [result] = await pool.execute(sql, [name, description]);
+  const id = randomUUID();
+  const [result] = await pool.execute(
+    'INSERT INTO categories (id, name, description) VALUES (?, ?, ?)',
+    [id, name.trim(), description.trim()]
+  );
+  result.insertId = id;
   return result;
 };
 

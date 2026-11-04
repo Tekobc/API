@@ -152,12 +152,12 @@ const ST={200:"OK",201:"Created",400:"Bad Request",401:"Unauthorized",403:"Forbi
 const NODES=[["📨","Petición","llega a Express"],["🔑","Auth","token y rol"],["✅","Validación","datos en regla"],["🧠","Service","reglas del negocio"],["🗄️","Base de datos","SQL y restricciones"],["📬","Respuesta","JSON + status"]];
 const V="SELECT m.*, c.name AS category FROM menu_items m JOIN categories c ON c.id = m.category_id";
 const EP=[
-{k:"list",m:"GET",p:"/api/menu/items",id:0,w:0,t:{category:"bebidas",available:true,limit:5},sql:V+"\nWHERE c.name = $1 AND m.available = $2\nORDER BY m.name LIMIT 5 OFFSET 0;"},
-{k:"one",m:"GET",p:"/api/menu/items/:id",id:1,w:0,t:{},sql:V+"\nWHERE m.id = $1;"},
-{k:"new",m:"POST",p:"/api/menu/items",id:0,w:1,t:{name:"Ravioles de ricota",description:"Con salsa fileto",price:480,categoryId:"c1"},sql:"INSERT INTO menu_items (name, description, price, category_id, available)\nVALUES ($1, $2, $3, $4, true) RETURNING id;"},
-{k:"upd",m:"PUT",p:"/api/menu/items/:id",id:1,w:1,t:{price:520},sql:"UPDATE menu_items SET price = $1\nWHERE id = $2;"},
-{k:"del",m:"DELETE",p:"/api/menu/items/:id",id:1,w:1,t:{},sql:"DELETE FROM menu_items WHERE id = $1;\n-- ERROR 23503: viola la FK de order_items (ON DELETE RESTRICT)"},
-{k:"img",m:"POST",p:"/api/menu/items/:id/upload-image",id:1,w:1,t:{image:"milanesa.jpg"},sql:"UPDATE menu_items SET image_url = $1\nWHERE id = $2;"}];
+{k:"list",m:"GET",p:"/api/menu/items",id:0,w:0,t:{category:"Bebidas",available:true,limit:5},sql:V+"\nWHERE c.name = ? AND m.available = ?\nORDER BY m.name LIMIT 5 OFFSET 0;"},
+{k:"one",m:"GET",p:"/api/menu/items/:id",id:1,w:0,t:{},sql:V+"\nWHERE m.id = ?;"},
+{k:"new",m:"POST",p:"/api/menu/items",id:0,w:1,t:{name:"Ravioles de ricota",description:"Con salsa fileto",price:480,categoryId:""},sql:"INSERT INTO menu_items (id, name, description, price, category_id, available)\nVALUES (UUID(), ?, ?, ?, ?, ?);"},
+{k:"upd",m:"PUT",p:"/api/menu/items/:id",id:1,w:1,t:{price:520},sql:"UPDATE menu_items SET price = ?\nWHERE id = ?;"},
+{k:"del",m:"DELETE",p:"/api/menu/items/:id",id:1,w:1,t:{},sql:"DELETE FROM menu_items WHERE id = ?;\n-- ER_ROW_IS_REFERENCED_2: la FK de order_items impide borrar ventas"},
+{k:"img",m:"POST",p:"/api/menu/items/:id/upload-image",id:1,w:1,t:{image:"milanesa.jpg"},sql:"UPDATE menu_items SET image_url = ?\nWHERE id = ?;"}];
 const WHY={INVALID_TOKEN:"Sin token no sabemos quién sos. La petición se corta en Auth y nunca toca la base de datos.",INSUFFICIENT_PERMISSIONS:"Estás identificado, pero ser cliente no alcanza para modificar la carta. Solo el admin escribe.",INVALID_INPUT:"Validamos antes de molestar a la base: es más rápido y el mensaje le dice al usuario qué corregir.",ITEM_NOT_FOUND:"El service busca el plato y no existe, así que responde 404 en lugar de inventar algo.",ITEM_IN_USE:"La base protege la historia: ese plato ya se vendió, así que no se borra. Se desactiva con available=false.",list:"Leer la carta es público: no hace falta token. Los filtros y límites evitan traer todo de golpe.",one:"Lectura pública de un solo plato.",new:"Plato creado. Queda disponible por defecto y con imagen pendiente.",upd:"Actualización parcial: solo cambia lo que enviaste. Mirá el historial de ventas abajo.",del:"Plato sin ventas: se pudo borrar.",NET:"No hubo respuesta: ¿está levantado el servidor? Si abriste este archivo con doble clic, serví la página desde Express.",img:"Imagen asociada. En el servidor real viaja como multipart/form-data."};
 let role="admin",mode="sim",tok={},base="",simItems=items,simCats=cats;
 
@@ -194,12 +194,16 @@ async function login(email,password){
  const j=await r.json(),t=j.data&&(j.data.token||j.data.accessToken);
  if(!r.ok||!t)throw new Error(j.message||"No se pudo iniciar sesión");return t}
 async function load(){
- try{const r=await fetch(base+"/api/menu/items?limit=100"),j=await r.json();
+ try{const [cr,ir]=await Promise.all([fetch(base+"/api/categories"),fetch(base+"/api/menu/items?limit=100")]);
+  const cjson=await cr.json(),rjson=await ir.json();
+  if(!cr.ok||cjson.success===false)throw new Error(cjson.message||"No se pudieron cargar las categorías");
+  if(!ir.ok||rjson.success===false)throw new Error(rjson.message||"No se pudo cargar el menú");
+  const j=rjson;
+  cats=cjson.data;
   items=j.data.items.map(i=>({...i,categoryId:i.categoryId||i.category}));
-  const m={};items.forEach(i=>m[i.categoryId]=i.category||i.categoryId);cats=Object.entries(m).map(([id,name])=>({id,name}));
   const c=cats[0];EP[2].t.categoryId=c?c.id:"";pick($("ep").value);
   $("hint").innerHTML="Categorías: "+(cats.map(c=>`<code>${esc(c.id)}</code> ${esc(c.name)}`).join(" · ")||"ninguna cargada");
- }catch(e){items=[];cats=[]}
+ }catch(e){items=[];cats=[];$("hint").textContent="Error: "+e.message}
  render()}
 async function real(k,id,b){
  const ep=EP.find(e=>e.k===k);let url=base+ep.p.replace(":id",id);const o={method:ep.m,headers:{}};
